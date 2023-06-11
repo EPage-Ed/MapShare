@@ -72,6 +72,10 @@ struct ContentView: View {
         
         Button {
           mapVM.addPin(pin: Pin(title: "New Pin", lat: visibleRegion!.center.latitude, lon: visibleRegion!.center.longitude))
+            let newItem = Item(timestamp: Date(), title: "New Pin", lat: visibleRegion!.center.latitude, lon: visibleRegion!.center.longitude)
+            modelContext.insert(newItem)
+            try? modelContext.save()
+            print("NewItem",newItem.title,newItem.lat,newItem.lon)
         } label: {
           Image(systemName: "plus.circle")
             .font(.largeTitle)
