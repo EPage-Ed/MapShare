@@ -14,7 +14,7 @@ extension CLLocationCoordinate2D {
   static let apple = CLLocationCoordinate2D(latitude: 37.334886, longitude: -122.008988)
 }
 
-struct Pin : Codable, Identifiable {
+struct Pin : Codable, Identifiable, Equatable {
   private(set) var id = UUID()
   let title : String
   let lat : Double
@@ -22,6 +22,7 @@ struct Pin : Codable, Identifiable {
   var loc : CLLocationCoordinate2D {
     CLLocationCoordinate2D(latitude: lat, longitude: lon)
   }
+
 }
 
 struct ContentView: View {
@@ -29,8 +30,18 @@ struct ContentView: View {
   @Query private var items: [Item]
   private var mapVM = MapVM()
   @State private var position: MapCameraPosition = .automatic
-  @State private var addMode = false
+//  @State private var addMode = false
   @State private var visibleRegion : MKCoordinateRegion? = nil
+  @State private var selectedPin: Pin? = nil
+  /*
+  @State private var selectedPin : MKMapItem? = nil {
+    didSet {
+      print("Hit \(selectedPin?.placemark)")
+    }
+  }
+   */
+//  @State private var selectedTag : Int?
+//  @State private var message : String?
   @StateObject var groupStateObserver = GroupStateObserver()
 
 
@@ -39,51 +50,97 @@ struct ContentView: View {
     ZStack(alignment: .bottomTrailing) {
       VStack {
         //      Map(initialPosition: .userLocation(fallback: .automatic)) {
-        Map(position: $position) {
+        Map(position: $position) { // , selection: $selectedPin) {
           //      Map(initialPosition: .item(MKMapItem(placemark: MKPlacemark(coordinate: .apple))), bounds: .init(centerCoordinateBounds: .init(center: .apple, span: .init(latitudeDelta: 0.01, longitudeDelta: 0.01)))) {
           ForEach(mapVM.pins) { pin in
-            Marker(pin.title, systemImage: "mappin", coordinate: pin.loc)
-            //          Annotation(pin.title, coordinate: pin.loc) {
-            //            Image(systemName: "mappin")
-            //          }
+//            Marker(pin.title, systemImage: "mappin", coordinate: pin.loc)
+//            Marker(item: MKMapItem(placemark: MKPlacemark(coordinate: pin.loc)))
+
+            Annotation(pin.title, coordinate: pin.loc) {
+              ZStack {
+//                RoundedRectangle(cornerRadius: 30)
+                Circle()
+                  .fill(.pink.opacity(0.4))
+                Image(systemName: "mappin")
+                  .font(.largeTitle)
+                  .foregroundColor(.red)
+                  .padding(8)
+              }
+              .onTapGesture {
+                print("Tap \(pin)")
+                selectedPin = pin // MKMapItem(placemark: MKPlacemark(coordinate: pin.loc))
+              }
+            }
+
+
           }
           
         }
-        //        .ignoresSafeArea(.all)
+        .mapStyle(.hybrid(elevation: .realistic, pointsOfInterest: .all))
+        .safeAreaInset(edge: .bottom) {
+          HStack {
+            Spacer()
+            VStack(spacing: 0) {
+              let _ = print(selectedPin)
+              if let selectedPin {
+                ItemView(pin: selectedPin)
+//                ItemView(selectedResult: selectedPin)
+                  .frame(height: 128)
+                  .clipShape(RoundedRectangle(cornerRadius: 10))
+                  .padding()
+              }
+            }
+          }
+        }
+        .mapControls {
+//            MapUserLocationButton()
+            MapCompass()
+            MapScaleView()
+        }
         .onMapCameraChange { context in
           visibleRegion = context.region
           print(context.region.center)
         }
-        
-        
       }
       .edgesIgnoringSafeArea(.all)
       
-      HStack {
-        if mapVM.groupSession == nil && groupStateObserver.isEligibleForGroupSession {
-          Button {
-            mapVM.startSharing()
-          } label: {
-            Image(systemName: "person.2.fill")
+      
+      VStack {
+//        if let message {
+//          Text(message ?? "Pin")
+//        }
+        HStack {
+          if mapVM.groupSession == nil && groupStateObserver.isEligibleForGroupSession {
+            Button {
+              mapVM.startSharing()
+            } label: {
+              Image(systemName: "person.2.fill")
+            }
+            .buttonStyle(.borderedProminent)
+            .padding(.horizontal)
           }
-          .buttonStyle(.borderedProminent)
-          .padding(.horizontal)
-        }
-        
-        Button {
-          mapVM.addPin(pin: Pin(title: "New Pin", lat: visibleRegion!.center.latitude, lon: visibleRegion!.center.longitude))
+          
+          Button {
+            mapVM.addPin(pin: Pin(title: "New Pin", lat: visibleRegion!.center.latitude, lon: visibleRegion!.center.longitude))
             let newItem = Item(timestamp: Date(), title: "New Pin", lat: visibleRegion!.center.latitude, lon: visibleRegion!.center.longitude)
             modelContext.insert(newItem)
             try? modelContext.save()
             print("NewItem",newItem.title,newItem.lat,newItem.lon)
-        } label: {
-          Image(systemName: "plus.circle")
-            .font(.largeTitle)
-//            Label("Add Item", systemImage: addMode ? "xmark" : "plus")
+          } label: {
+            Image(systemName: "plus.circle")
+              .font(.largeTitle)
+              .foregroundColor(.orange)
+          }
+          
         }
-
       }
       .padding()
+
+      .onChange(of: selectedPin) {
+        if let selectedPin {
+          print("Hello World")
+        }
+      }
     }
       
       /*
@@ -145,6 +202,35 @@ struct ContentView: View {
     }
   }
    */
+}
+
+struct ItemView: View {
+  @State private var lookAroundScene: MKLookAroundScene?
+//  var selectedResult : MKMapItem
+  var pin : Pin
+  
+  func getLookAroundScene() {
+    lookAroundScene = nil
+    Task {
+      let request = MKLookAroundSceneRequest(coordinate: pin.loc)
+//      let request = MKLookAroundSceneRequest(mapItem: selectedResult)
+      lookAroundScene = try? await request.scene
+//      print(lookAroundScene)
+    }
+  }
+  
+  var body: some View {
+    LookAroundPreview(initialScene: lookAroundScene)
+      .overlay(alignment: .bottomTrailing) {
+        Text("Look Around")
+      }
+      .onAppear {
+        getLookAroundScene()
+      }
+      .onChange(of: pin) {
+        getLookAroundScene()
+      }
+  }
 }
 
 #Preview {
