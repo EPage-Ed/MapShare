@@ -30,18 +30,8 @@ struct ContentView: View {
   @Query private var items: [Item]
   private var mapVM = MapVM()
   @State private var position: MapCameraPosition = .automatic
-//  @State private var addMode = false
   @State private var visibleRegion : MKCoordinateRegion? = nil
   @State private var selectedPin: Pin? = nil
-  /*
-  @State private var selectedPin : MKMapItem? = nil {
-    didSet {
-      print("Hit \(selectedPin?.placemark)")
-    }
-  }
-   */
-//  @State private var selectedTag : Int?
-//  @State private var message : String?
   @StateObject var groupStateObserver = GroupStateObserver()
 
 
@@ -49,16 +39,10 @@ struct ContentView: View {
     
     ZStack(alignment: .bottomTrailing) {
       VStack {
-        //      Map(initialPosition: .userLocation(fallback: .automatic)) {
-        Map(position: $position) { // , selection: $selectedPin) {
-          //      Map(initialPosition: .item(MKMapItem(placemark: MKPlacemark(coordinate: .apple))), bounds: .init(centerCoordinateBounds: .init(center: .apple, span: .init(latitudeDelta: 0.01, longitudeDelta: 0.01)))) {
+        Map(position: $position) {
           ForEach(mapVM.pins) { pin in
-//            Marker(pin.title, systemImage: "mappin", coordinate: pin.loc)
-//            Marker(item: MKMapItem(placemark: MKPlacemark(coordinate: pin.loc)))
-
             Annotation(pin.title, coordinate: pin.loc) {
               ZStack {
-//                RoundedRectangle(cornerRadius: 30)
                 Circle()
                   .fill(.pink.opacity(0.4))
                 Image(systemName: "mappin")
@@ -81,7 +65,6 @@ struct ContentView: View {
           HStack {
             Spacer()
             VStack(spacing: 0) {
-              let _ = print(selectedPin)
               if let selectedPin {
                 ItemView(pin: selectedPin)
 //                ItemView(selectedResult: selectedPin)
@@ -93,7 +76,6 @@ struct ContentView: View {
           }
         }
         .mapControls {
-//            MapUserLocationButton()
             MapCompass()
             MapScaleView()
         }
@@ -106,9 +88,6 @@ struct ContentView: View {
       
       
       VStack {
-//        if let message {
-//          Text(message ?? "Pin")
-//        }
         HStack {
           if mapVM.groupSession == nil && groupStateObserver.isEligibleForGroupSession {
             Button {
@@ -135,41 +114,7 @@ struct ContentView: View {
         }
       }
       .padding()
-
-      .onChange(of: selectedPin) {
-        if let selectedPin {
-          print("Hello World")
-        }
-      }
     }
-      
-      /*
-      
-      NavigationView {
-        List {
-          ForEach(items) { item in
-            NavigationLink {
-              Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-            } label: {
-              Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-            }
-          }
-          .onDelete(perform: deleteItems)
-        }
-        .toolbar {
-          ToolbarItem(placement: .navigationBarTrailing) {
-            EditButton()
-          }
-          ToolbarItem {
-            Button(action: addItem) {
-              Label("Add Item", systemImage: addMode ? "xmark" : "plus")
-            }
-          }
-        }
-        Text("Select an item")
-      }
-    }
-       */
     .onAppear {
       mapVM.pins = [
         Pin(title: "Apple", lat: CLLocationCoordinate2D.apple.latitude, lon: CLLocationCoordinate2D.apple.longitude)
@@ -181,27 +126,6 @@ struct ContentView: View {
       }
     }
   }
-  
-  /*
-  private func addItem() {
-    mapVM.addPin(pin: Pin(title: "New Pin", lat: visibleRegion!.center.latitude, lon: visibleRegion!.center.longitude))
-//    addMode.toggle()
-    /*
-    withAnimation {
-      let newItem = Item(timestamp: Date())
-      modelContext.insert(newItem)
-    }
-     */
-  }
-  
-  private func deleteItems(offsets: IndexSet) {
-    withAnimation {
-      for index in offsets {
-        modelContext.delete(items[index])
-      }
-    }
-  }
-   */
 }
 
 struct ItemView: View {
@@ -213,9 +137,7 @@ struct ItemView: View {
     lookAroundScene = nil
     Task {
       let request = MKLookAroundSceneRequest(coordinate: pin.loc)
-//      let request = MKLookAroundSceneRequest(mapItem: selectedResult)
       lookAroundScene = try? await request.scene
-//      print(lookAroundScene)
     }
   }
   

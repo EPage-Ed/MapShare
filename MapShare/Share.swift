@@ -16,7 +16,6 @@ struct MapActivity : GroupActivity {
     var metadata = GroupActivityMetadata()
     
     metadata.title = "Map Together"
-//    metadata.previewImage = UIImage(named: "ActivityImage")?.cgImage
     metadata.type = .generic
     
     return metadata

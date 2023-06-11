@@ -82,7 +82,7 @@ class MapVM {
       }
       .store(in: &subscriptions)
     
-    var task = Task {
+      let task = Task {
       for await (message, _) in messenger.messages(of: PinMessage.self) {
         handle(message)
       }
