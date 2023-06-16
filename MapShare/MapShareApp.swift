@@ -10,11 +10,11 @@ import SwiftData
 
 @main
 struct MapShareApp: App {
-
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-        .modelContainer(for: Item.self)
+  
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
     }
+    .modelContainer(for: Item.self)
+  }
 }

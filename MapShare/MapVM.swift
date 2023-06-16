@@ -8,10 +8,12 @@
 import Observation
 import Combine
 import GroupActivities
+import MapKit
 
 @Observable
 class MapVM {
   var pins = [Pin]()
+  var visibleRegion : MKCoordinateRegion? = nil
 
   var groupSession: GroupSession<MapActivity>? = nil
   @ObservationIgnored var messenger: GroupSessionMessenger? = nil
@@ -40,6 +42,14 @@ class MapVM {
     if let messenger = messenger {
       Task {
         try? await messenger.send(PinMessage(pins: pins, count: pins.count))
+      }
+    }
+  }
+  
+  func centerMap(loc: CLLocationCoordinate2D) {
+    if let messenger = messenger {
+      Task {
+        try? await messenger.send(CenterMessage(lat: loc.latitude, lon: loc.longitude))
       }
     }
   }
@@ -78,12 +88,16 @@ class MapVM {
         
         Task {
           try? await messenger.send(PinMessage(pins: self.pins, count: self.pins.count), to: .only(newParticipants))
+          try? await messenger.send(CenterMessage(lat: self.visibleRegion!.center.longitude, lon: self.visibleRegion!.center.longitude), to: .only(newParticipants))
         }
       }
       .store(in: &subscriptions)
     
-      let task = Task {
+    let task = Task {
       for await (message, _) in messenger.messages(of: PinMessage.self) {
+        handle(message)
+      }
+      for await (message, _) in messenger.messages(of: CenterMessage.self) {
         handle(message)
       }
     }
@@ -94,7 +108,11 @@ class MapVM {
   
   func handle(_ message: PinMessage) {
     guard message.count > self.pins.count else { return }
-      self.pins = message.pins
+    self.pins = message.pins
+  }
+  func handle(_ message: CenterMessage) {
+//    guard message.count > self.pins.count else { return }
+//    self.pins = message.pins
   }
 
 }

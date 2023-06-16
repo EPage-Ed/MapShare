@@ -28,6 +28,11 @@ struct PinMessage: Codable {
   let count: Int
 }
 
+struct CenterMessage: Codable {
+  let lat : Double
+  let lon : Double
+}
+
 
 
 class MapShare {

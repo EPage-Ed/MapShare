@@ -14,6 +14,7 @@
 		D893AC102A355EF700DED359 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = D893AC0F2A355EF700DED359 /* Item.swift */; };
 		D893AC192A3569CE00DED359 /* Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = D893AC182A3569CE00DED359 /* Share.swift */; };
 		D893AC1B2A356D6E00DED359 /* MapVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = D893AC1A2A356D6E00DED359 /* MapVM.swift */; };
+		D8E0C6412A39920B000B4C5C /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E0C6402A39920B000B4C5C /* Models.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		D893AC122A355EF700DED359 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D893AC182A3569CE00DED359 /* Share.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Share.swift; sourceTree = "<group>"; };
 		D893AC1A2A356D6E00DED359 /* MapVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVM.swift; sourceTree = "<group>"; };
+		D8E0C6402A39920B000B4C5C /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 			children = (
 				D893AC062A355EF600DED359 /* MapShareApp.swift */,
 				D893AC082A355EF600DED359 /* ContentView.swift */,
+				D8E0C6402A39920B000B4C5C /* Models.swift */,
 				D893AC1A2A356D6E00DED359 /* MapVM.swift */,
 				D893AC182A3569CE00DED359 /* Share.swift */,
 				D893AC0A2A355EF700DED359 /* Assets.xcassets */,
@@ -153,6 +156,7 @@
 				D893AC1B2A356D6E00DED359 /* MapVM.swift in Sources */,
 				D893AC092A355EF600DED359 /* ContentView.swift in Sources */,
 				D893AC192A3569CE00DED359 /* Share.swift in Sources */,
+				D8E0C6412A39920B000B4C5C /* Models.swift in Sources */,
 				D893AC102A355EF700DED359 /* Item.swift in Sources */,
 				D893AC072A355EF600DED359 /* MapShareApp.swift in Sources */,
 			);
